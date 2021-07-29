@@ -1,0 +1,52 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: practica-kube-mysql
+  name: practica-kube-mysql
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: practica-kube-mysql
+  template:
+    metadata:
+      labels:
+        app: practica-kube-mysql
+    spec:
+      containers:
+      - env:
+        - name: RDS_DB_NAME
+          value: todos
+        - name: RDS_HOSTNAME
+          value: mysql
+        - name: RDS_PASSWORD
+          value: admin
+        - name: RDS_PORT
+          value: "3306"
+        - name: RDS_USERNAME
+          value: admin
+        image: practica-kube-mysql:v1
+        name: practica-kube-mysql
+        ports:
+        - containerPort: 8080
+      restartPolicy: Always
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: practica-kube-mysql
+  name: practica-kube-mysql
+  namespace: default
+spec:
+  ports:
+  - nodePort: 30731
+    port: 8080
+    protocol: TCP
+    targetPort: 8080
+  selector:
+    app: practica-kube-mysql
+  type: LoadBalancer
+
